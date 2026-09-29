@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# Pytest
+.pytest_cache/
+
+# IDE
+.vscode/
+
+# Build
+build/
+dist/
+*.spec
+
+# Temporary files
+*.log
+*.tmp
+
+# Output files
+data/output/*
+!data/output/.gitkeep
