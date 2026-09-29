@@ -2,10 +2,13 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from pathlib import Path
 
+from src.services.import_service import ImportService
+
 
 class MainWindow:
     def __init__(self, root):
         self.root = root
+
         self.root.title("AutoUSMCA")
         self.root.geometry("850x550")
         self.root.minsize(750, 500)
@@ -36,12 +39,22 @@ class MainWindow:
             padx=15,
             pady=15
         )
-        frame_archivos.pack(fill="x", padx=30, pady=10)
+        frame_archivos.pack(
+            fill="x",
+            padx=30,
+            pady=10
+        )
 
+        # Reporte de costos
         tk.Label(
             frame_archivos,
             text="Reporte de costos:"
-        ).grid(row=0, column=0, sticky="w", pady=8)
+        ).grid(
+            row=0,
+            column=0,
+            sticky="w",
+            pady=8
+        )
 
         self.lbl_costos = tk.Label(
             frame_archivos,
@@ -60,12 +73,21 @@ class MainWindow:
             text="Seleccionar",
             command=self.seleccionar_costos
         )
-        btn_costos.grid(row=0, column=2)
+        btn_costos.grid(
+            row=0,
+            column=2
+        )
 
+        # Reporte de consumos
         tk.Label(
             frame_archivos,
             text="Reporte de consumos:"
-        ).grid(row=1, column=0, sticky="w", pady=8)
+        ).grid(
+            row=1,
+            column=0,
+            sticky="w",
+            pady=8
+        )
 
         self.lbl_consumos = tk.Label(
             frame_archivos,
@@ -84,10 +106,17 @@ class MainWindow:
             text="Seleccionar",
             command=self.seleccionar_consumos
         )
-        btn_consumos.grid(row=1, column=2)
+        btn_consumos.grid(
+            row=1,
+            column=2
+        )
 
-        frame_archivos.columnconfigure(1, weight=1)
+        frame_archivos.columnconfigure(
+            1,
+            weight=1
+        )
 
+        # Botón procesar
         self.btn_procesar = tk.Button(
             self.root,
             text="Procesar archivos",
@@ -95,8 +124,11 @@ class MainWindow:
             height=2,
             command=self.procesar
         )
-        self.btn_procesar.pack(pady=15)
+        self.btn_procesar.pack(
+            pady=15
+        )
 
+        # Resultados
         frame_resultados = tk.LabelFrame(
             self.root,
             text="Resultados",
@@ -113,9 +145,12 @@ class MainWindow:
         self.lbl_estado = tk.Label(
             frame_resultados,
             text="Esperando archivos para iniciar el procesamiento.",
-            anchor="w"
+            anchor="w",
+            justify="left"
         )
-        self.lbl_estado.pack(fill="x")
+        self.lbl_estado.pack(
+            fill="x"
+        )
 
     def seleccionar_costos(self):
         archivo = filedialog.askopenfilename(
@@ -129,7 +164,10 @@ class MainWindow:
 
         if archivo:
             self.archivo_costos = archivo
-            self.lbl_costos.config(text=Path(archivo).name)
+
+            self.lbl_costos.config(
+                text=Path(archivo).name
+            )
 
     def seleccionar_consumos(self):
         archivo = filedialog.askopenfilename(
@@ -143,7 +181,10 @@ class MainWindow:
 
         if archivo:
             self.archivo_consumos = archivo
-            self.lbl_consumos.config(text=Path(archivo).name)
+
+            self.lbl_consumos.config(
+                text=Path(archivo).name
+            )
 
     def procesar(self):
         if not self.archivo_costos or not self.archivo_consumos:
@@ -153,10 +194,36 @@ class MainWindow:
             )
             return
 
-        self.lbl_estado.config(
-            text="Archivos seleccionados correctamente. "
-                 "El módulo de procesamiento será implementado posteriormente."
-        )
+        try:
+            df_costos = ImportService.cargar_archivo(
+                self.archivo_costos
+            )
+
+            df_consumos = ImportService.cargar_archivo(
+                self.archivo_consumos
+            )
+
+            total_costos = len(df_costos)
+            total_consumos = len(df_consumos)
+
+            self.lbl_estado.config(
+                text=(
+                    "Archivos cargados correctamente.\n\n"
+                    f"Registros del reporte de costos: {total_costos}\n"
+                    f"Registros del reporte de consumos: {total_consumos}"
+                )
+            )
+
+            messagebox.showinfo(
+                "Importación completada",
+                "Los archivos fueron cargados correctamente."
+            )
+
+        except Exception as error:
+            messagebox.showerror(
+                "Error al importar archivos",
+                str(error)
+            )
 
 
 def iniciar_aplicacion():
