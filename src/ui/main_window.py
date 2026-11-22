@@ -10,9 +10,7 @@ from tkinter import filedialog, messagebox, ttk
 from src.procesamiento_usmca import procesar_producto, procesar_todos_productos
 from src.ui.config_window import ConfigWindow
 from src.ui.historial_window import HistorialWindow
-
-
-BASE_DIR = Path(__file__).resolve().parents[2]
+from src.rutas import BASE_DIR
 
 
 class MainWindow:

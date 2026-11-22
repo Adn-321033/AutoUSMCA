@@ -1,16 +1,10 @@
-
 import logging
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
 
+from src.rutas import RUTA_LOG
 
 NOMBRE_LOGGER = "AutoUSMCA"
-
-RUTA_LOG = (
-    Path(__file__).resolve().parents[2]
-    / "logs"
-    / "autousmca.log"
-)
 
 
 def configurar_logger(ruta_log=None):

@@ -3,15 +3,9 @@ import json
 import math
 import unicodedata
 from pathlib import Path
+from src.rutas import RUTA_CONFIGURACION
 from src.seguridad_umbral import verificar_contrasena
 from src.utils.logger import obtener_logger
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-RUTA_CONFIGURACION = (
-    BASE_DIR / "config" / "configuracion.json"
-)
 
 PAISES_REGIONALES = {"MEX", "USA", "CAN"}
 

@@ -1,9 +1,9 @@
-
 import sqlite3
 from pathlib import Path
 
+from src.rutas import RUTA_BASE_DATOS
 
-DB_PATH = Path("database") / "autousmca.db"
+DB_PATH = RUTA_BASE_DATOS
 
 
 def obtener_conexion(ruta_db=None):

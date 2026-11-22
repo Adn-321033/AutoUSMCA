@@ -6,12 +6,9 @@ import json
 import secrets
 from pathlib import Path
 
+from src.rutas import RUTA_SEGURIDAD_UMBRAL
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-RUTA_SEGURIDAD = (
-    BASE_DIR / "config" / "seguridad_umbral.json"
-)
+RUTA_SEGURIDAD = RUTA_SEGURIDAD_UMBRAL
 
 ITERACIONES = 600_000
 
