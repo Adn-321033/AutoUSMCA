@@ -54,3 +54,6 @@ config/*.tmp
 
 # Distribución final de AutoUSMCA
 /AutoUSMCA_Entrega/
+
+# Copias adicionales de la distribución
+/AutoUSMCA_Entrega - Copy/
