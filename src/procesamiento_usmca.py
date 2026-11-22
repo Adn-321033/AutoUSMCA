@@ -4,6 +4,9 @@ from src.generador_pdf import generar_reporte_pdf
 
 import pandas as pd
 
+import getpass
+from src.repositories.historial_repository import guardar_ejecucion
+
 from src.validacion_archivos import (
     validar_disc_by_export,
     validar_wk_cost,
@@ -104,6 +107,89 @@ def procesar_producto(numero_parte, directorio_base):
         materiales_originales=len(materiales_originales),
     )
 
+
+    # 9. Preparar el detalle de materiales
+    # para guardar la ejecución en el historial.
+    detalle_materiales = []
+
+    for _, material in materiales.iterrows():
+        costo_no_regional = material["COSTO_I"]
+
+        if pd.isna(costo_no_regional):
+            costo_no_regional = 0.0
+
+        detalle_materiales.append({
+            "numero_parte": str(material["PARTE"]),
+            "descripcion": str(
+                material["DESCRIPCION INGLES"]
+            ),
+            "fraccion_arancelaria": str(
+                material["FRACCION MX"]
+            ),
+            "pais_origen": str(material["ORIGEN"]),
+            "es_regional": bool(material["ES_REGIONAL"]),
+            "kilogramos": float(
+                material["KILOGRAMOS IMPORTACION"]
+            ),
+            "costo_total": float(material["COSTO_G"]),
+            "costo_no_regional": float(
+                costo_no_regional
+            ),
+        })
+
+    # 10. Construir el registro de la ejecución.
+    datos_historial = {
+        "usuario": getpass.getuser(),
+        "archivo_costos": str(
+            entrada / "P_Wk_Cost.xlsx"
+        ),
+        "archivo_consumos": str(
+            entrada / "P_DISC_BY_EXPORT1.xlsx"
+        ),
+        "resultados": [
+            {
+                "numero_parte": parte,
+                "total_materiales": resultado[
+                    "total_materiales"
+                ],
+                "labor_day": resultado["labor_day"],
+                "indirect_costs": resultado[
+                    "indirect_costs"
+                ],
+                "costo_neto": resultado["costo_neto"],
+                "costo_no_originario": resultado[
+                    "costo_no_originario"
+                ],
+                "porcentaje_no_regional": resultado[
+                    "porcentaje"
+                ],
+                "cumple": resultado[
+                    "dentro_umbral_10"
+                ],
+                "materiales_originales": len(
+                    materiales_originales
+                ),
+                "materiales_consolidados": len(
+                    materiales
+                ),
+                "archivo_excel": str(archivo_salida),
+                "archivo_pdf": str(archivo_pdf),
+                "materiales": detalle_materiales,
+            }
+        ],
+    }
+
+    # 11. Guardar la ejecución en SQLite.
+    ejecucion_id = guardar_ejecucion(
+        datos_historial,
+        ruta_db=base / "database" / "autousmca.db",
+    )
+
+    print(
+        f"Ejecución registrada en el historial. "
+        f"ID: {ejecucion_id}"
+    )
+
     return {
         "producto": parte,
         "materiales_originales": len(materiales_originales),
@@ -111,4 +197,5 @@ def procesar_producto(numero_parte, directorio_base):
         "resultado": resultado,
         "archivo": archivo_salida,
         "archivo_pdf": archivo_pdf,
+        "ejecucion_id": ejecucion_id,
     }
