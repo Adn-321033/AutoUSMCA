@@ -187,12 +187,18 @@ def generar_reporte_pdf(
         estilos["Normal"],
     ))
 
-    dentro = porcentaje <= 10.0 + 1e-10
+    # Utilizar el umbral aplicado por el motor de cálculo.
+    umbral = float(resultado.get("umbral_utilizado", 10.0))
+
+    dentro = resultado.get(
+        "cumple",
+        porcentaje <= umbral + 1e-10
+    )
 
     comparacion = (
-        "Dentro del umbral de referencia del 10%"
+        f"Dentro del umbral configurado del {umbral:g}%"
         if dentro
-        else "Por encima del umbral de referencia del 10%"
+        else f"Por encima del umbral configurado del {umbral:g}%"
     )
 
     elementos.append(Paragraph(
@@ -256,8 +262,9 @@ def generar_reporte_pdf(
         "<b>Nota:</b> Reporte de apoyo generado por "
         "AutoUSMCA. El porcentaje se calcula con los "
         "datos proporcionados. La comparación con el "
-        "10% es informativa y no constituye por sí sola "
-        "una certificación de origen T-MEC.",
+        f"umbral configurado del {umbral:g}% es informativa "
+        "y no constituye por sí sola una certificación "
+        "de origen T-MEC.",
         estilos["CeldaUSMCA"],
     ))
 

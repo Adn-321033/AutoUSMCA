@@ -132,3 +132,53 @@ def test_porcentaje_ct0143_real():
         f" | No originario: {resultado['costo_no_originario']:.5f}"
         f" | Porcentaje: {resultado['porcentaje']:.5f}%"
     )
+
+
+def test_umbral_configurable():
+    import pandas as pd
+
+    from src.configuracion import configuracion_predeterminada
+    from src.regla_origen import verificar_regla_origen
+
+    materiales = pd.DataFrame({
+        "COSTO_G": [90.0, 10.0],
+        "COSTO_I": [float("nan"), 10.0],
+    })
+
+    financieros = {
+        "labor_day": 0.0,
+        "indirect_costs": 0.0,
+    }
+
+    config = configuracion_predeterminada()
+
+    # Escenario 1: umbral del 10 %
+    config["umbral_porcentaje"] = 10.0
+
+    resultado_10 = verificar_regla_origen(
+        materiales, financieros, configuracion=config
+    )
+
+    assert resultado_10["porcentaje"] == 10.0
+    assert resultado_10["cumple"] is True
+
+    # Escenario 2: umbral del 5 %
+    config["umbral_porcentaje"] = 5.0
+
+    resultado_5 = verificar_regla_origen(
+        materiales, financieros, configuracion=config
+    )
+
+    assert resultado_5["porcentaje"] == 10.0
+    assert resultado_5["cumple"] is False
+
+    # El cálculo debe mantenerse idéntico.
+    assert (
+        resultado_10["costo_neto"]
+        == resultado_5["costo_neto"]
+    )
+
+    assert (
+        resultado_10["costo_no_originario"]
+        == resultado_5["costo_no_originario"]
+    )

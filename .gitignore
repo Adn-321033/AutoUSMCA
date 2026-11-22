@@ -42,3 +42,12 @@ data/output/*
 *.xls
 *.csv
 *.pdf
+
+# Seguridad administrativa
+config/seguridad_umbral.json
+
+# Respaldos de seguridad
+*.bak
+
+# Archivos de configuración temporales
+config/*.tmp

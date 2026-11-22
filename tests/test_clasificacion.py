@@ -44,7 +44,7 @@ def test_pais_invalido():
     })
 
     with pytest.raises(
-        ValueError, match="origen inválidos"
+        ValueError, match="País de origen no reconocido"
     ):
         clasificar_materiales(df)
 
@@ -131,3 +131,31 @@ def test_clasificacion_ct0143_real():
         resultado["COSTO_H"].notna()
         & resultado["COSTO_I"].notna()
     ).any()
+
+def test_clasificacion_pais_equivalente():
+    from src.configuracion import configuracion_predeterminada
+
+    config = configuracion_predeterminada()
+
+    config["equivalencias_paises"]["CHINA"] = "CHN"
+
+    df = pd.DataFrame({
+        "ORIGEN": ["CHINA", "México"],
+        "VALOR US": [5.00, 10.00]
+    })
+
+    resultado = clasificar_materiales(
+        df, configuracion=config
+    )
+
+    assert resultado["ORIGEN"].tolist() == [
+        "CHN", "MEX"
+    ]
+
+    assert resultado["ES_REGIONAL"].tolist() == [
+        False, True
+    ]
+
+    assert resultado["COSTO_I"].sum() == pytest.approx(
+        5.00
+    )

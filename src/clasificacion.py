@@ -1,19 +1,21 @@
 
 import pandas as pd
 
+from src.configuracion import (
+    cargar_configuracion,
+    normalizar_pais,
+    PAISES_REGIONALES,
+)
 
-PAISES_REGIONALES = {"MEX", "USA", "CAN"}
 
-
-def clasificar_materiales(df):
+def clasificar_materiales(df, configuracion=None):
     """
-    Clasifica los materiales según su país de origen.
+    Clasifica materiales según su país de origen.
 
-    Regionales: MEX, USA, CAN.
-    No regionales: los demás códigos de tres letras.
+    Acepta códigos de tres letras y equivalencias
+    definidas en la configuración del sistema.
 
-    Prepara los costos de las columnas F, G, H e I
-    de P_WORKSHEET.
+    Conserva las columnas de costos F, G, H e I.
     """
 
     if df.empty:
@@ -33,22 +35,17 @@ def clasificar_materiales(df):
             f"Columnas faltantes: {faltantes}"
         )
 
-    resultado["ORIGEN"] = (
-        resultado["ORIGEN"]
-        .astype("string")
-        .str.strip()
-        .str.upper()
+    if configuracion is None:
+        configuracion = cargar_configuracion()
+
+    # Normalizar los países utilizando el catálogo.
+    resultado["ORIGEN"] = resultado["ORIGEN"].apply(
+        lambda pais: normalizar_pais(
+            pais, configuracion
+        )
     )
 
-    origen_valido = resultado["ORIGEN"].str.fullmatch(
-        r"[A-Z]{3}"
-    ).fillna(False)
-
-    if not origen_valido.all():
-        raise ValueError(
-            "Se encontraron códigos de origen inválidos."
-        )
-
+    # Validar los costos de los materiales.
     resultado["VALOR US"] = pd.to_numeric(
         resultado["VALOR US"],
         errors="coerce"
@@ -62,6 +59,7 @@ def clasificar_materiales(df):
             "Se encontraron costos inválidos."
         )
 
+    # Clasificar materiales regionales.
     resultado["ES_REGIONAL"] = (
         resultado["ORIGEN"].isin(PAISES_REGIONALES)
     )

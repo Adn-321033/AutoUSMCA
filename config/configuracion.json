@@ -1,0 +1,15 @@
+{
+    "umbral_porcentaje": 10.0,
+    "equivalencias_paises": {
+        "MEX": "MEX",
+        "MX": "MEX",
+        "MEXICO": "MEX",
+        "USA": "USA",
+        "US": "USA",
+        "UNITED STATES": "USA",
+        "ESTADOS UNIDOS": "USA",
+        "CAN": "CAN",
+        "CA": "CAN",
+        "CANADA": "CAN"
+    }
+}

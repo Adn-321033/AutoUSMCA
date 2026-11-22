@@ -3,8 +3,10 @@ import math
 
 import pandas as pd
 
+from src.configuracion import cargar_configuracion
 
-def verificar_regla_origen(materiales, financieros):
+
+def verificar_regla_origen(materiales, financieros, configuracion=None):
     """
     Calcula el porcentaje no originario utilizando
     la lógica de P_WORKSHEET:
@@ -65,6 +67,15 @@ def verificar_regla_origen(materiales, financieros):
     proporcion = costo_no_originario / costo_neto
     porcentaje = proporcion * 100
 
+        # Obtener el umbral configurado.
+    if configuracion is None:
+        configuracion = cargar_configuracion()
+
+    umbral = configuracion["umbral_porcentaje"]
+
+    # Determinar el cumplimiento.
+    cumple = porcentaje <= umbral + 1e-10
+
     return {
         "total_materiales": total_materiales,
         "labor_day": labor,
@@ -73,5 +84,7 @@ def verificar_regla_origen(materiales, financieros):
         "costo_no_originario": costo_no_originario,
         "proporcion": proporcion,
         "porcentaje": porcentaje,
-        "dentro_umbral_10": proporcion <= 0.10 + 1e-12
+        "dentro_umbral_10": cumple,
+        "cumple": cumple,
+        "umbral_utilizado": umbral,
     }
