@@ -51,3 +51,6 @@ config/seguridad_umbral.json
 
 # Archivos de configuración temporales
 config/*.tmp
+
+# Distribución final de AutoUSMCA
+/AutoUSMCA_Entrega/
